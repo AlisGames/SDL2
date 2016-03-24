@@ -63,7 +63,7 @@ int Emscripten_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rec
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     surface = data->surface;
     if (!surface) {
-        return SDL_SetError("Couldn't find dummy surface for window");
+        return SDL_SetError("Couldn't find framebuffer surface for window");
     }
 
     /* Send the data to the display */
@@ -76,7 +76,7 @@ int Emscripten_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rec
         if (!Module['SDL2']) Module['SDL2'] = {};
         var SDL2 = Module['SDL2'];
         if (SDL2.ctxCanvas !== Module['canvas']) {
-            SDL2.ctx = Module['canvas'].getContext('2d');
+            SDL2.ctx = Module['createContext'](Module['canvas'], false, true);
             SDL2.ctxCanvas = Module['canvas'];
         }
         if (SDL2.w !== w || SDL2.h !== h || SDL2.imageCtx !== SDL2.ctx) {
@@ -100,7 +100,7 @@ int Emscripten_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rec
                 data[dst  ] = val & 0xff;
                 data[dst+1] = (val >> 8) & 0xff;
                 data[dst+2] = (val >> 16) & 0xff;
-                data[dst+3] = isScreen ? 0xff : ((val >> 24) & 0xff);
+                data[dst+3] = 0xff;
                 src++;
                 dst += 4;
             }
